@@ -1,0 +1,19 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "Nordural050196",
+    "database": "urlshortener_development",
+    "host": "localhost",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "postgres",
+    "password": "Nordural050196",
+    "database": "urlshortener_production",
+    "host": "localhost",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "use_env_variable": "DATABASE_URL"
+  }
+}
