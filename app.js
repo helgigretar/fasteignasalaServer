@@ -12,16 +12,18 @@ app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
 app.get('/', async(req, res)=> {
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'urlshortener_development',
-    password: 'Nordural050196',
-    port: 5432,
-  })
-  await client.connect()
-  /*await client.query('Select * from urls;', (err, res) => {    
+  try{
 
+    const client = new Client({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'urlshortener_production',
+      password: 'Nordural050196',
+      port: 5432,
+    })
+    await client.connect()
+    /*await client.query('Select * from urls;', (err, res) => {    
+      
       console.log(err, res.fields[0].tableID)
       const r = res.fields[0].tableID
       client.end()
@@ -30,6 +32,9 @@ app.get('/', async(req, res)=> {
     const result = await client.query('Select * from urls;')
     //res.send(result.rows[0].message)
     return res.json({"BBB":result});
+  }catch(e){
+    res.json({"Erro":e})
+  }
 });
 
 app.post('/url', function(req, res) {
