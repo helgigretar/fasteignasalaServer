@@ -4,16 +4,22 @@ const port = process.env.PORT || 3000;
 const exphbs  = require('express-handlebars');
 const urlShortener = require('node-url-shortener');
 const bodyParser = require('body-parser');
-const db = require('./models/index.js');
+const moment = require('moment')
 const { Pool, Client } = require('pg')
+
+
+
+
+var jwt = require('jwt-simple');
+
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.urlencoded());
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
-
+app.set('jwtTokenSecret', 'YOUR_SECRET_STRING');
 app.get('/', async(req, res)=> {
   try{
-
     const client = new Client({
       user: 'drejoxqksziety',
       host: 'ec2-54-195-247-108.eu-west-1.compute.amazonaws.com',
@@ -21,21 +27,41 @@ app.get('/', async(req, res)=> {
       password: 'c1d0a5ba1ad75f9e465c78ea4222e2f5c83fda8184415a77e38100ce5feac47c',
       port: 5432,
     })
-    await client.connect()
-    /*await client.query('Select * from urls;', (err, res) => {    
-      
-      console.log(err, res.fields[0].tableID)
-      const r = res.fields[0].tableID
-      client.end()
-      console.log(r, " lllllll")
+    /*const client = new Client({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'postgres',
+      password: 'Nordural050196',
+      port: 5432,
     })*/
-    const result = await client.query('Select * from urls;')
+    await client.connect()
+    const result = await client.query('Select * from persons;')
+    console.log(result)
     //res.send(result.rows[0].message)
     return res.json({"BBB":result});
   }catch(e){
+    console.log(e)
     res.json({"Erro":e})
   }
 });
+
+
+app.get('/token',async (req,res)=>{
+  var expires = moment().add('days', 7).valueOf();
+  console.log(expires)
+  
+var token = jwt.encode({
+  iss: 55,//user.id
+  exp: expires
+}, app.get('jwtTokenSecret'));
+
+res.json({
+  token : token,
+  expires: expires,
+  user: "user.toJSON()"
+});
+})
+
 
 app.post('/url', function(req, res) {
   const url = req.body.url
