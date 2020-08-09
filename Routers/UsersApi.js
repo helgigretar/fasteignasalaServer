@@ -176,5 +176,8 @@ router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
     const result = await client.query(query, values)
     res.json({ "status": true })
 })
+router.get("/test",async function(req,res){
+    res.json({"status":"test"})
+})
 
 module.exports = router
