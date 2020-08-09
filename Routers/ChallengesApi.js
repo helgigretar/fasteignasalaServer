@@ -441,5 +441,5 @@ router.put("/StartChallengebyChallengeId", async function(req,res){
     return res.json({"status":"challenge has been started"})
 })
 
-
 module.exports = router
+module.exports.HowLongAgo = HowLongAgo

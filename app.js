@@ -14,24 +14,25 @@ app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 app.set('jwtTokenSecret', 'YOUR_SECRET_STRING');
 const users = require('./Routers/UsersApi')
-const UsersScore = require('./Routers/UsersScore')
 const friends = require('./Routers/FriendsApi')
 const leaderBoard = require('./Routers/LeaderBoardApi')
 const challenges = require('./Routers/ChallengesApi')
 const challengeInvestor = require('./Routers/ChallengeInvestorApi')
 const StoryChallenges = require('./Routers/StoryChallenges')
 const comments = require('./Routers/CommentsApi')
+const underChallenges = require('./Routers/UnderChallengesApi')
+const notifications = require('./Routers/NotificationsApi')
 
 //Here are the home routes
 app.use('/Users',users)
-app.use('/',UsersScore)
 app.use('/Friends',friends)
 app.use('/LeaderBoards',leaderBoard)
 app.use('/Challenges',challenges)
 app.use('/challengeInvestors',challengeInvestor)
 app.use('/StoryChallenges',StoryChallenges)
 app.use('/Comments',comments)
-
+app.use('/underChallenges',underChallenges)
+app.use("/Notifications", notifications)
 global.credentials = {
   "user": "postgres",
   "host": "localhost",
