@@ -29,7 +29,7 @@ router.post("/addChallengeInvestor", async function (req, res) {
         }else{
             //Create
             await AddInvestor(chosen_winner_user_id,challenge_id,user_id)
-            res.json({"status":"Added a new challenge investor"})    
+            res.json({"status":"Added a new challenge investor."})    
         }
     }else{
         return res.json({"status":"user is not alllowed to invest on his own challenge"})
