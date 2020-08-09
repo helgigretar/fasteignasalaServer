@@ -35,7 +35,7 @@ router.post('/userLogin', async function (req, res) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query = "Select name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
+    const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
     let values = [];
     values.push(user_name) //Name = 1
     values.push(password) // password =2
@@ -74,7 +74,8 @@ router.post('/CreateUser', async function (req, res) {
     const query = "INSERT INTO users_score (user_id,league_id,points)VALUES ($1,1,0)"
     const values = [id]
     result = await client.query(query, values)
-    return res.json({ "status": "created" });
+    //I need to check if username is unique.
+    return res.json({ "status": true });
 })
 //get the last user id
 async function getLastsUserId() {
