@@ -47,5 +47,5 @@ global.credentials = {
   "password":"c1d0a5ba1ad75f9e465c78ea4222e2f5c83fda8184415a77e38100ce5feac47c",
   "port":5432
 };
-
+ 
 app.listen(port, () => console.log(`url-shortener listening on port ${port}!`));
