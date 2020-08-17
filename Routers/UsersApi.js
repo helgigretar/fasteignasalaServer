@@ -45,7 +45,11 @@ router.post('/userLogin', async function (req, res) {
     const data = result.rows
     if (data.length === 1) {
         data.authStatus = false;
-        return res.json({ "user": data, "status": true })
+        const user = {
+            "id":data.id,"name":data.name,"user_name":data.password, "email":data.email,"country":data.country,"age":data.age,
+            "image_url":data.image_url,"description":data.description,"gender":data.gender
+        }
+        return res.json({ "user": user, "status": true })
     } else {
         return res.json({ "status": false })
     }
