@@ -25,14 +25,14 @@ router.post("/addChallengeInvestor", async function (req, res) {
         if(userModifieing ===false){
             //Mod
             await UpdateExistingChallengeInvestor(chosen_winner_user_id,challenge_id,user_id)
-            res.json({"status":"Modified existing challenge investor"})    
+            res.json({"status":"Modified existing challenge investor",allowed:true})    
         }else{
             //Create
             await AddInvestor(chosen_winner_user_id,challenge_id,user_id)
-            res.json({"status":"Added a new challenge investor."})    
+            res.json({"status":"Added a new challenge investor.",allowed:true})    
         }
     }else{
-        return res.json({"status":"user is not alllowed to invest on his own challenge"})
+        return res.json({"status":"user is not alllowed to invest on his own challenge",allowed:false})
     }    
 })
 async function IsUserAllowedToAddInvestors(user_id,challenge_id){
