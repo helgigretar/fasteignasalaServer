@@ -173,6 +173,7 @@ router.get("/getChallengeByChallengeId/:challenge_id/:user_id", async function (
     })
     res.json(data)
 })
+
 router.get("/getAllChallenges/:user_id", async function (req, res) {    
     const user_id = req.params.user_id
     const query = `
