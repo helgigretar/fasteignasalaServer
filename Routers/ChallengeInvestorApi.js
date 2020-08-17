@@ -13,27 +13,32 @@ router.post("/addChallengeInvestor", async function (req, res) {
     //Check if allowed to create
     let allowedToCreate = false;
     let userModifieing =false;
-    await IsUserAllowedToAddInvestors(user_id,challenge_id).then(res=>{
-        allowedToCreate = res
-    })
-    if(allowedToCreate===true){
-        //Check if user is modifieing or creating
-       await IsUserModifieing(challenge_id,user_id).then(res=>{
-            userModifieing =res
+    try{
+        //Since I am using a cheap shit I have to have a try right here
+        await IsUserAllowedToAddInvestors(user_id,challenge_id).then(res=>{
+            allowedToCreate = res
         })
-        console.log(userModifieing, " jsjsjjjs ")
-        if(userModifieing ===false){
-            //Mod
-            await UpdateExistingChallengeInvestor(chosen_winner_user_id,challenge_id,user_id)
-            res.json({"status":"Modified existing challenge investor",allowed:true})    
+        if(allowedToCreate===true){
+            //Check if user is modifieing or creating
+            await IsUserModifieing(challenge_id,user_id).then(res=>{
+                userModifieing =res
+            })
+            console.log(userModifieing, " jsjsjjjs ")
+            if(userModifieing ===false){
+                //Mod
+                await UpdateExistingChallengeInvestor(chosen_winner_user_id,challenge_id,user_id)
+                res.json({"status":"Modified existing challenge investor",allowed:true})    
+            }else{
+                //Create
+                await AddInvestor(chosen_winner_user_id,challenge_id,user_id)
+                res.json({"status":"Added a new challenge investor.",allowed:true})    
+            }
         }else{
-            //Create
-            await AddInvestor(chosen_winner_user_id,challenge_id,user_id)
-            res.json({"status":"Added a new challenge investor.",allowed:true})    
-        }
-    }else{
-        return res.json({"status":"user is not alllowed to invest on his own challenge",allowed:false})
-    }    
+            return res.json({"status":"user is not alllowed to invest on his own challenge",allowed:false})
+        }    
+    }catch{
+    res.json({status:"To many connections",allowed:false})
+    }
 })
 async function IsUserAllowedToAddInvestors(user_id,challenge_id){
     const cred = global.credentials
