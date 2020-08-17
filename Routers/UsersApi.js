@@ -46,8 +46,8 @@ router.post('/userLogin', async function (req, res) {
     if (data.length === 1) {
         data.authStatus = false;
         const user = {
-            "id":data.id,"name":data.name,"user_name":data.password, "email":data.email,"country":data.country,"age":data.age,
-            "image_url":data.image_url,"description":data.description,"gender":data.gender
+            "id":data[0].id,"name":data[0].name,"user_name":data[0].password, "email":data[0].email,"country":data[0].country,"age":data[0].age,
+            "image_url":data[0].image_url,"description":data[0].description,"gender":data[0].gender
         }
         return res.json({ "user": user, "status": true })
     } else {
