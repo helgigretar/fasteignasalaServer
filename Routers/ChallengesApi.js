@@ -243,7 +243,7 @@ async function GetingChallengeInfoFromQuery(query, values) {
             finished_date = HowLongAgo(finished_date);
         }
         const storyChallenges = []
-        storyChallenges.push({ "image_url":row.challenge_image_url, "header": ""})
+        storyChallenges.push({ "image_url":row.image_url, "header": ""})
         if (row.story_images !== null) {
             for (let i = 0; i < row.story_images.length; i++) {
                 storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i] })
