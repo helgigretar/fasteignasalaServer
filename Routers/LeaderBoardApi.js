@@ -29,6 +29,7 @@ router.get("/getAllUsersRankingbyLeagueId/:league_id", async function (req, res)
     `
     let values = [id];    
     const result = await client.query(query, values)
+    client.end();
     res.json(result.rows)    
 })
 

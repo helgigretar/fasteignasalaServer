@@ -33,6 +33,7 @@ router.get("/getAllofAnteUsersNotMyFriends/:user_id", async function (req, res) 
     let values = [];
     values.push(user_id) //1
     const result = await client.query(query, values)
+    client.end();
     res.json(result.rows)    
 })
 //Get all of my friends
@@ -54,6 +55,7 @@ router.get("/getAllOfMyFriendsByUserId/:user_id", async function (req, res) {
     `
     let values = [user_id];    
     const result = await client.query(query, values)
+    client.end();
     res.json(result.rows)    
 })
 //Remove friend relations
@@ -67,6 +69,7 @@ router.delete("/removeFriendByFriendsRelationId/:friends_relation_id", async fun
     `
     let values = [id];    
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"Deleted"})    
 })
 //add friend relation
@@ -80,6 +83,7 @@ router.post("/addFriend", async function (req, res) {
     `
     let values = [user_id,friend_id];    
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"Added a new friend"})    
 })
 module.exports = router

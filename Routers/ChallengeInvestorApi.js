@@ -47,6 +47,7 @@ async function IsUserAllowedToAddInvestors(user_id,challenge_id){
     const query = "Select count(id) from challenges Where (challengee_user_id= $1 or challenger_user_id= $1) and id = $2";
     let values = [user_id,challenge_id]; 
     const result = await client.query(query, values)
+    client.end();
     if(result.rows[0].count === "0"){
         return true;
     }else{
@@ -62,6 +63,7 @@ async function IsUserModifieing(challenge_id,user_id){
     `
     let values = [user_id,challenge_id]; 
     const result = await client.query(query, values)
+    client.end();
     console.log(result.rows[0].count)
     if(result.rows[0].count === "0"){
         console.log("heere")
@@ -79,6 +81,7 @@ async function UpdateExistingChallengeInvestor(chosen_winner_user_id,challenge_i
     `
     let values = [user_id,challenge_id,chosen_winner_user_id]; 
     const result = await client.query(query, values)
+    client.end();
     return
 }
 async function AddInvestor(chosen_winner_user_id,challenge_id,user_id){
@@ -90,6 +93,7 @@ async function AddInvestor(chosen_winner_user_id,challenge_id,user_id){
     `
     let values = [user_id,challenge_id,chosen_winner_user_id]; 
     const result = await client.query(query, values)
+    client.end();
     return   
 } 
 router.delete("/DeleteExcistingRow", async function (req, res) {
@@ -102,6 +106,7 @@ router.delete("/DeleteExcistingRow", async function (req, res) {
     `
     let values = [user_id,challenge_id]; 
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"Challenge investment has been reomved"})     
 })
 

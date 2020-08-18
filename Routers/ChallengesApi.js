@@ -36,6 +36,7 @@ async function CreateNewNotficationsRow(challenge_id,message,receive_user_id, se
     values.push(receive_user_id);//4
     values.push(type);//5
     const result = await client.query(query, values)
+    client.end();
     return
 }
 //Get the latest challenge id
@@ -47,6 +48,7 @@ async function GetChallengeLastId(){
         Select id from challenges order by id desc Limit 1
     `
     const result = await client.query(query)
+    client.end();
     return result.rows[0].id
 }
 //Creta a new challenge
@@ -70,6 +72,7 @@ async function CreateChallenge(body){
     values.push(body.prize);//9
     values.push(body.end_date);//10
     const result = await client.query(query, values)
+    client.end();
     return result
 }
 router.get("/getChallengesByUserId/:user_id", async function (req, res) {
@@ -227,6 +230,7 @@ async function GetingChallengeInfoFromQuery(query, values) {
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const result = await client.query(query, values)
+    client.end();
     const data = []
     const current = new Date();
     result.rows.forEach(row => {
@@ -348,6 +352,7 @@ router.put("/AcceptChallenge", async function (req,res){
     const query = `update challenges set accepted_date = NOW(), last_modified_date = NOW() WHERE id = $1`
     const values=[id]
     const result = await client.query(query, values)
+    client.end();
     //Challenger fær svar til baka um að hans challenge hafi verið samþykkt
     let {challenge_name,user_name} = ""
     await GetChallengeeName(id).then(res=>{
@@ -368,6 +373,7 @@ async function ConfirmingNotificationAction(challenge_id,status){
     `
     const values=[challenge_id,status]
     const result = await client.query(query, values)
+    client.end();
     return result
 }
 async function GetChallengeeName(challenge_id){
@@ -384,6 +390,7 @@ async function GetChallengeeName(challenge_id){
     Where challenges.id = $1`
     const values=[challenge_id]
     const result = await client.query(query, values)
+    client.end();
     return result
 }
 async function GetChallengerName(challenge_id){
@@ -400,6 +407,7 @@ async function GetChallengerName(challenge_id){
     Where challenges.id = $1`
     const values=[challenge_id]
     const result = await client.query(query, values)
+    client.end();
     return result
 }
 router.put("/finishChallenge", async function(req,res){
@@ -412,6 +420,7 @@ router.put("/finishChallenge", async function(req,res){
     `
     const values=[id,winner_user_id]
     const result = await client.query(query, values)
+    client.end();
     let {challenge_name,user_name} = ""
     await GetChallengerName(id).then(res=>{
         challenge_name= res.rows[0].challenge_name
@@ -432,6 +441,7 @@ router.put("/StartChallengebyChallengeId", async function(req,res){
     `
     const values=[id]
     const result = await client.query(query, values)
+    client.end();
     let {challenge_name,user_name} = ""
     await GetChallengeeName(id).then(res=>{
         challenge_name= res.rows[0].challenge_name

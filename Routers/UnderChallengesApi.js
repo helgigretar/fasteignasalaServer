@@ -26,6 +26,7 @@ router.post("/createUnderChallenge", async function (req, res) {
     values.push(terms) //     6
     values.push(prize) //     7
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"under challenge has been created"})    
 })
 router.get("/getUnderChallengesByChallengeID/:challenge_id", async function(req,res){
@@ -48,6 +49,7 @@ router.get("/getUnderChallengesByChallengeID/:challenge_id", async function(req,
     `
     const values =[challenge_id]
     const result = await client.query(query, values)
+    client.end();
     res.json(result.rows)    
 })
 

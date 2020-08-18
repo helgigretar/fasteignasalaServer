@@ -19,6 +19,7 @@ router.post("/AddStoryToChallenge", async function (req, res) {
     `
     let values = [challenge_id,image_url,header];    
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"Story added to challenge"})    
 })
 

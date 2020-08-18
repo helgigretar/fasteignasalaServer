@@ -33,6 +33,7 @@ router.get("/getAllNotifications/:user_id", async function(req,res){
     `
     const values =[user_id]
     const result = await client.query(query, values)
+    client.end();
     res.json(result.rows)    
 })
 

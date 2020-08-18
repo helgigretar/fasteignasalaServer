@@ -28,6 +28,7 @@ async function registerUser(req) {
     values.push(description) // description = 8
     values.push(gender) // gender = 9
     const result = await client.query(query, values)
+    client.end();
 }
 //Login returns status strue if user may login
 router.post('/userLogin', async function (req, res) {
@@ -40,6 +41,7 @@ router.post('/userLogin', async function (req, res) {
     values.push(user_name) //Name = 1
     values.push(password) // password =2
     const result = await client.query(query, values)
+    client.end();
     let authStatus = false;
     console.log(result.rows.length)
     const data = result.rows
@@ -78,6 +80,7 @@ router.post('/CreateUser', async function (req, res) {
     const query = "INSERT INTO users_score (user_id,league_id,points)VALUES ($1,1,0)"
     const values = [id]
     result = await client.query(query, values)
+    client.end();
     //I need to check if username is unique.
     return res.json({ "status": true });
 })
@@ -88,6 +91,7 @@ async function getLastsUserId() {
     await client.connect()
     const query = "SELECT id FROM users ORDER BY id DESC LIMIT 1;"
     const result = await client.query(query)
+    client.end();
     return result.rows[0].id
 }
 router.get("/getUserByUserId/:user_id", async function (req, res) {
@@ -129,6 +133,7 @@ async function GetUserByUserId(user_id){
     Where users.id = 1`;
     const values = [user_id];
     const result = await client.query(query, values)
+    client.end();
    return result.rows;
 }
 //get users Rangking by user id for league one
@@ -138,6 +143,8 @@ async function GetUsersRankingByUserID(user_id){
     await client.connect()
     const query = "Select user_id,points from users_score order by points desc";    
     const result = await client.query(query)
+    client.end();
+    client.end();
     let count = 1;
     let finalCount = 0;
     result.rows.forEach(row=>{
@@ -165,6 +172,7 @@ router.put("/changeUsersDescriptionAndName/:user_id", async function (req, res) 
     values.push(country) // 5
     values.push(user_id) // 6
     const result = await client.query(query, values)
+    client.end();
     res.json({ "status": true })
 })
 //edit user. me image
@@ -179,6 +187,7 @@ router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
     values.push(image_url) //1
     values.push(user_id) // 2
     const result = await client.query(query, values)
+    client.end();
     res.json({ "status": true })
 })
 router.get("/test",async function(req,res){

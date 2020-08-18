@@ -18,6 +18,7 @@ router.post("/addComment", async function (req, res) {
     `
     let values = [user_id,challenge_id,message];    
     const result = await client.query(query, values)
+    client.end();
     res.json({"status":"comment created"})    
 })
 router.get("/getcommentsForChallengeByChallengeId/:challenge_id", async function(req,res){
@@ -41,6 +42,7 @@ router.get("/getcommentsForChallengeByChallengeId/:challenge_id", async function
     `
     let values = [challenge_id];    
     const result = await client.query(query, values)
+    client.end();
     const data = []
     result.rows.forEach(row=>{
         data.push({
