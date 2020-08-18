@@ -15,11 +15,11 @@ router.get("/getAllNotifications/:user_id", async function(req,res){
     await client.connect()
     const query =  `
         Select 
-            challenges.image_url
+            challenges.image_url as challenge_image_url
             ,notifications.message
             ,notifications.type
             ,users.name
-            ,users.image_url
+            ,users.image_url as image_url
             ,challenges.id
             ,challenges.challenger_user_id
             ,notifications.receive_user_id
