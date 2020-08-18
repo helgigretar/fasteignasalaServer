@@ -165,7 +165,8 @@ router.get("/getChallengeByChallengeId/:challenge_id/:user_id", async function (
         ,challenges.terms
         ,challenges.prize
         ,(Select (array_agg(image_url)) from story_challenges Where challenge_id = challenges.id) as story_images
-        ,(Select (array_agg(header)) from story_challenges Where challenge_id = challenges.id)  as story_headers                             
+        ,(Select (array_agg(header)) from story_challenges Where challenge_id = challenges.id)  as story_headers     
+        ,challenges.end_date as end_date                        
     from challenges
     Where challenges.id = $2
 `
@@ -267,7 +268,7 @@ async function GetingChallengeInfoFromQuery(query, values) {
             "challenge_investors_for_challengee": row.challenge_investors_for_challengee,
             "challengee_investor_color": HasUserInvestedInChallenge(row.challengee_investor_color),
             "created_date": created_date, "finished_date": finished_date,
-            "terms": row.terms, "prize": row.prize
+            "terms": row.terms, "prize": row.prize,"end_date":row.end_date
         })
     })
     return data;
