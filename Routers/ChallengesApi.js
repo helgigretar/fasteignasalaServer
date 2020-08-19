@@ -350,7 +350,7 @@ router.put("/AcceptChallenge", async function (req,res){
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query = `update challenges set accepted_date = NOW(), last_modified_date = NOW() WHERE id = $1`
+    const query = `update challenges set accepted_date = NOW(), last_modified_date = NOW(),status='On going' WHERE id = $1`
     const values=[id]
     const result = await client.query(query, values)
     client.end();
