@@ -371,7 +371,6 @@ async function ConfirmingNotificationAction(challenge_id,status){
     await client.connect()
     const query =`
     Update notifications set action_commited = true, action_commited_date=NOW() Where challenge_id = $1 AND type = $2;
-    update challenges set end_date = NOW() Where id = 5;
     `
     const values=[challenge_id,status]
     const result = await client.query(query, values)
