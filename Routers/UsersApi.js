@@ -43,7 +43,6 @@ router.post('/userLogin', async function (req, res) {
     const result = await client.query(query, values)
     client.end();
     let authStatus = false;
-    console.log(result.rows.length)
     const data = result.rows
     if (data.length === 1) {
         data.authStatus = false;
@@ -130,7 +129,7 @@ async function GetUserByUserId(user_id){
         ,(Select count(id) from challenges Where challenges.winner_user_id = $1) as won				
         ,(Select count(id) from user_did_not_pay Where user_id = $1) as user_did_not_pay
     from users
-    Where users.id = 1`;
+    Where users.id = $1`;
     const values = [user_id];
     const result = await client.query(query, values)
     client.end();

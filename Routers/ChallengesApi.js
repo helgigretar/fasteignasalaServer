@@ -3,6 +3,7 @@ var router = express.Router()
 bodyParser = require('body-parser');
 const { Pool, Client } = require('pg');
 const e = require('express');
+const { head } = require('./UsersApi');
 
 // support parsing of application/json type post data
 router.use(bodyParser.json());
@@ -15,7 +16,6 @@ router.post("/createChallenge", async function (req, res) {
     await GetChallengeLastId().then(res=>{
         challenge_id=res
     })
-    console.log(challenge_id)
     const msg = "You got a new challenge ! " + req.body.name + " Do you want to accept ? ";
     await CreateNewNotficationsRow(challenge_id, msg, req.body.challengee_user_id, req.body.challenger_user_id, "CREATE")
     res.json({ "status": "created" })
@@ -113,11 +113,12 @@ router.get("/getChallengesByUserId/:user_id", async function (req, res) {
             ,to_char(challenges.finished_date, 'dd.mm.yyyy') as finished_date
             ,challenges.terms
             ,challenges.prize
-            ,(Select (array_agg(image_url)) from story_challenges Where challenge_id = challenges.id) as story_images
-            ,(Select (array_agg(header)) from story_challenges Where challenge_id = challenges.id)  as story_headers                             
+            ,(Select (array_agg(image_url ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id) as story_images
+            ,(Select (array_agg(header ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_headers       
+            ,(Select (array_agg(story_challenges.id ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_id                             
         from challenges
         Where challenges.challenger_user_id = $1 or challenges.challengee_user_id = $1
-        order by last_modified_date desc
+        order by challenges.starting_date desc
     `
     const values = [user_id]
     let data = []
@@ -164,8 +165,9 @@ router.get("/getChallengeByChallengeId/:challenge_id/:user_id", async function (
         ,to_char(challenges.finished_date, 'dd.mm.yyyy') as finished_date
         ,challenges.terms
         ,challenges.prize
-        ,(Select (array_agg(image_url)) from story_challenges Where challenge_id = challenges.id) as story_images
-        ,(Select (array_agg(header)) from story_challenges Where challenge_id = challenges.id)  as story_headers     
+        ,(Select (array_agg(image_url ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id) as story_images
+        ,(Select (array_agg(header ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_headers   
+        ,(Select (array_agg(story_challenges.id ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_id  
         ,challenges.end_date as end_date                        
     from challenges
     Where challenges.id = $2
@@ -215,9 +217,11 @@ router.get("/getAllChallenges/:user_id", async function (req, res) {
         ,to_char(challenges.finished_date, 'dd.mm.yyyy') as finished_date
         ,challenges.terms
         ,challenges.prize
-        ,(Select (array_agg(image_url)) from story_challenges Where challenge_id = challenges.id) as story_images
-        ,(Select (array_agg(header)) from story_challenges Where challenge_id = challenges.id)  as story_headers                             
+        ,(Select (array_agg(image_url ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id) as story_images
+        ,(Select (array_agg(header ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_headers     
+        ,(Select (array_agg(story_challenges.id ORDER BY created_date DESC)) from story_challenges Where challenge_id = challenges.id)  as story_id                        
     from challenges
+     order by challenges.starting_date desc
 `
     const values = [user_id]
     let data = []
@@ -248,10 +252,10 @@ async function GetingChallengeInfoFromQuery(query, values) {
             finished_date = HowLongAgo(finished_date);
         }
         const storyChallenges = []
-        storyChallenges.push({ "image_url":row.image_url, "header": row.name})
+        storyChallenges.push({ "image_url":row.image_url, "header": row.name,"id":null})
         if (row.story_images !== null) {
             for (let i = 0; i < row.story_images.length; i++) {
-                storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i] })
+                storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i],"id":row.story_id[i] })
             }
         }
         data.push({
@@ -284,7 +288,6 @@ function GetRightStatusColor(txt) {
     }
 }
 function HasUserInvestedInChallenge(numb) {
-    console.log(typeof (numb), " ", numb)
     if (numb === "1") {
         return "green";
     } else {
@@ -453,6 +456,64 @@ router.put("/StartChallengebyChallengeId", async function(req,res){
     await ConfirmingNotificationAction(id,"ACCEPT")
     return res.json({"status":"challenge has been started"})
 })
+//Accepts, Starts and answers the challenge. This only happens when a challengee is accepting a challenge that was selected to be created now
+router.put("/AcceptStartAnswerChallenge", async function(req,res){
+    const cred = global.credentials
+    const {challengeID,challengee_user_id,challenger_user_id,image_url,header} =req.body
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    await client.connect()
+    const query = `
+        update challenges set status = 'On going', last_modified_date = NOW() WHERE id = $1
+    `
+    const values=[challengeID]
+    const result = await client.query(query, values)
+    client.end();
+    let {challenge_name,user_name} = ""
+    await GetChallengeeName(challengeID).then(res=>{
+        challenge_name= res.rows[0].challenge_name
+        user_name = res.rows[0].user_name
+    })
+    let message = "Your challenge on " + challenge_name + " has been started by " + user_name
+    await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"START");
+    await ConfirmingNotificationAction(challengeID,"ACCEPT")
+    await InsertToStoryChallenges(challengeID,image_url,header)
+    return res.json({"status":"challenge has been started and answered"})
 
+})
+async function InsertToStoryChallenges(challenge_id,image_url,header){
+    const cred = global.credentials
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    await client.connect()
+    const query =  `
+    INSERT INTO story_challenges (challenge_id,image_url,header) VALUES ($1,$2,$3)
+    `
+    let values = [challenge_id,image_url,header];    
+    const result = await client.query(query, values)
+    client.end();
+    return true;
+}
+//Challengee Declines the challenge. 
+router.delete("/DeclineChallenge", async function(req,res){
+    const cred = global.credentials
+    const {challengeID,challengee_user_id,challenger_user_id,image_url,header} =req.body
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    await client.connect()
+    const query = `
+        update challenges set status = 'Declined', last_modified_date = NOW() WHERE id = $1
+    `
+    const values=[challengeID]
+    const result = await client.query(query, values)
+    client.end();
+    let {challenge_name,user_name} = ""
+    await GetChallengeeName(challengeID).then(res=>{
+        challenge_name= res.rows[0].challenge_name
+        user_name = res.rows[0].user_name
+    })
+    let message = "Your challenge on " + challenge_name + " has been Declined by " + user_name
+    await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"Declined");
+    await ConfirmingNotificationAction(challengeID,"Declined")
+    return res.json({"status":"challenge has been Declined"})
+
+})
 module.exports = router
 module.exports.HowLongAgo = HowLongAgo

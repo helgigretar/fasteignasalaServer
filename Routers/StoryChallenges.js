@@ -22,5 +22,18 @@ router.post("/AddStoryToChallenge", async function (req, res) {
     client.end();
     res.json({"status":"Story added to challenge"})    
 })
-
+//Remove story challenge by its id
+router.delete("/RemoveStoryChallenge", async function (req, res) {
+    const {story_id} = req.body;
+    const cred = global.credentials
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    await client.connect()
+    const query =  `
+    Delete from story_challenges Where id = $1
+    `
+    let values = [story_id];    
+    const result = await client.query(query, values)
+    client.end();
+    res.json({"status":"Story Removed"})    
+})
 module.exports = router
