@@ -252,7 +252,7 @@ async function GetingChallengeInfoFromQuery(query, values) {
             finished_date = HowLongAgo(finished_date);
         }
         const storyChallenges = []
-        storyChallenges.push({ "image_url":row.image_url, "header": row.name,"id":null})
+        storyChallenges.push({ "image_url":row.image_url, "header": "","id":null})
         if (row.story_images !== null) {
             for (let i = 0; i < row.story_images.length; i++) {
                 storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i],"id":row.story_id[i] })
@@ -475,7 +475,7 @@ router.put("/AcceptStartAnswerChallenge", async function(req,res){
     })
     let message = "Your challenge on " + challenge_name + " has been started by " + user_name
     await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"START");
-    await ConfirmingNotificationAction(challengeID,"ACCEPT")
+    await ConfirmingNotificationAction(challengeID,"CREATE")
     await InsertToStoryChallenges(challengeID,image_url,header)
     return res.json({"status":"challenge has been started and answered"})
 
