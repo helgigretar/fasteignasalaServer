@@ -36,7 +36,7 @@ router.get("/getAllofAnteUsersNotMyFriends/:user_id", async function (req, res) 
             Where user_id = $1) 
         or friends.friend_id is null )
         order by users_score.points desc`
-    let values = [];
+    let values = []; 
     values.push(user_id) //1
     const result = await client.query(query, values)
     client.end();
