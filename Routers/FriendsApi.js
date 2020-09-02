@@ -35,7 +35,7 @@ router.get("/getAllofAnteUsersNotMyFriends/:user_id", async function (req, res) 
             on friends.friend_id = users.id 
             Where user_id = $1) 
         or friends.friend_id is null )
-    Where users.id != $1
+    AND users.id != $1
         order by users_score.points desc`
     let values = []; 
     values.push(user_id) //1
