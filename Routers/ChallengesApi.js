@@ -511,7 +511,7 @@ router.delete("/DeclineChallenge", async function(req,res){
     })
     let message = "Your challenge on " + challenge_name + " has been Declined by " + user_name
     await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"Declined");
-    await ConfirmingNotificationAction(challengeID,"Declined")
+    await ConfirmingNotificationAction(challengeID,"CREATE")
     return res.json({"status":"challenge has been Declined"})
 
 })
