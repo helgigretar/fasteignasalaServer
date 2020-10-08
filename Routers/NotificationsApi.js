@@ -10,6 +10,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 router.get("/getAllNotifications/:user_id", async function(req,res){
     const user_id = req.params.user_id
+    console.log(user_id)
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -24,6 +25,7 @@ router.get("/getAllNotifications/:user_id", async function(req,res){
             ,challenges.challenger_user_id
             ,notifications.receive_user_id
             ,notifications.action_commited
+            ,notifications.created_date
         from notifications
         INNER JOIN users 
             on users.id = notifications.send_user_id
@@ -32,8 +34,11 @@ router.get("/getAllNotifications/:user_id", async function(req,res){
         Where notifications.receive_user_id = $1
     `
     const values =[user_id]
-    const result = await client.query(query, values)
+    let result = await client.query(query, values)
     client.end();
+    result.rows.forEach(row=>{
+        row.created_date =  challenges.HowLongAgo(row.created_date)
+    })
     res.json(result.rows)    
 })
 

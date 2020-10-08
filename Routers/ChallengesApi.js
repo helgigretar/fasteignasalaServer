@@ -341,7 +341,6 @@ function HowLongAgo(setDate) {
     if (delta < 12 * MONTH) {
         var months = Math.round(parseInt((delta / (60 * 60 * 24 * 30))))
         return months <= 1 ? "one month ago" : months + " months ago";
-        //  let months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
     }
     else {
         var years = Math.round(parseInt((delta / (60 * 60 * 24 * 30 * 365))))
@@ -513,7 +512,21 @@ router.delete("/DeclineChallenge", async function(req,res){
     await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"Declined");
     await ConfirmingNotificationAction(challengeID,"CREATE")
     return res.json({"status":"challenge has been Declined"})
-
 })
+//Delete challenge
+router.delete("/DeleteChallengeByID/:challenge_id", async function(req,res){
+    const challengeID = req.params.challenge_id
+    const cred = global.credentials
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    await client.connect()
+    const query = `
+        Delete from challenges Where id = $1
+    `
+    const values=[challengeID]
+    const result = await client.query(query, values)
+    client.end();
+    return res.json({"status":"Delete challenge"})
+})
+
 module.exports = router
 module.exports.HowLongAgo = HowLongAgo
